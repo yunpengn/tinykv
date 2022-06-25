@@ -47,7 +47,8 @@ func (server *Server) Snapshot(stream tinykvpb.TinyKv_SnapshotServer) error {
 	return server.storage.(*raft_storage.RaftStorage).Snapshot(stream)
 }
 
-// Transactional API.
+// The functions below are Server's Transactional API.
+
 func (server *Server) KvGet(_ context.Context, req *kvrpcpb.GetRequest) (*kvrpcpb.GetResponse, error) {
 	// Your Code Here (4B).
 	return nil, nil

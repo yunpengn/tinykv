@@ -11,8 +11,7 @@ option (gogoproto.sizer_all) = true;
 option (gogoproto.marshaler_all) = true;
 option (gogoproto.unmarshaler_all) = true;
 
-// Serve as a distributed kv database. See the request and response definitions in
-// kvrpcpb.proto
+// Serve as a distributed kv database. See the request and response definitions in kvrpcpb.proto
 service TinyKv {
     // KV commands with mvcc/txn supported.
     rpc KvGet(kvrpcpb.GetRequest) returns (kvrpcpb.GetResponse) {}

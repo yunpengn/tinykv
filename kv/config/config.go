@@ -45,12 +45,11 @@ func (c *Config) Validate() error {
 	}
 
 	if c.RaftElectionTimeoutTicks != 10 {
-		log.Warnf("Election timeout ticks needs to be same across all the cluster, " +
-			"otherwise it may lead to inconsistency.")
+		log.Warnf("Election timeout ticks needs to be same across all the cluster, otherwise it may lead to inconsistency.")
 	}
 
 	if c.RaftElectionTimeoutTicks <= c.RaftHeartbeatTicks {
-		return fmt.Errorf("election tick must be greater than heartbeat tick.")
+		return fmt.Errorf("election tick must be greater than heartbeat tick")
 	}
 
 	return nil
@@ -71,16 +70,15 @@ func getLogLevel() (logLevel string) {
 
 func NewDefaultConfig() *Config {
 	return &Config{
-		SchedulerAddr:            "127.0.0.1:2379",
-		StoreAddr:                "127.0.0.1:20160",
-		LogLevel:                 getLogLevel(),
-		Raft:                     true,
-		RaftBaseTickInterval:     1 * time.Second,
-		RaftHeartbeatTicks:       2,
-		RaftElectionTimeoutTicks: 10,
-		RaftLogGCTickInterval:    10 * time.Second,
-		// Assume the average size of entries is 1k.
-		RaftLogGcCountLimit:                 128000,
+		SchedulerAddr:                       "127.0.0.1:2379",
+		StoreAddr:                           "127.0.0.1:20160",
+		LogLevel:                            getLogLevel(),
+		Raft:                                true,
+		RaftBaseTickInterval:                1 * time.Second,
+		RaftHeartbeatTicks:                  2,
+		RaftElectionTimeoutTicks:            10,
+		RaftLogGCTickInterval:               10 * time.Second,
+		RaftLogGcCountLimit:                 128000, // Assume the average size of entries is 1k.
 		SplitRegionCheckTickInterval:        10 * time.Second,
 		SchedulerHeartbeatTickInterval:      10 * time.Second,
 		SchedulerStoreHeartbeatTickInterval: 10 * time.Second,
