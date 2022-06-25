@@ -46,7 +46,9 @@ func (s *StandAloneStorage) Start() error {
 }
 
 func (s *StandAloneStorage) Stop() error {
-	// Your Code Here (1).
+	if err := s.db.Close(); err != nil {
+		log.Warnf("Unable to close the badger DB due to %s", err)
+	}
 	return nil
 }
 
