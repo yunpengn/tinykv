@@ -10,8 +10,7 @@ import (
 	"github.com/pingcap-incubator/tinykv/proto/pkg/kvrpcpb"
 )
 
-// MemStorage is an in-memory storage engine used for testing. Data is not written to disk, nor sent to other
-// nodes. It is intended for testing only.
+// MemStorage is an in-memory storage engine used for testing. Data is not written to disk, nor sent to other nodes. It is intended for testing only.
 type MemStorage struct {
 	CfDefault *llrb.LLRB
 	CfLock    *llrb.LLRB
@@ -26,19 +25,23 @@ func NewMemStorage() *MemStorage {
 	}
 }
 
+// Start ...
 func (s *MemStorage) Start() error {
 	return nil
 }
 
+// Stop ...
 func (s *MemStorage) Stop() error {
 	return nil
 }
 
-func (s *MemStorage) Reader(ctx *kvrpcpb.Context) (StorageReader, error) {
+// Reader ...
+func (s *MemStorage) Reader(_ *kvrpcpb.Context) (StorageReader, error) {
 	return &memReader{s, 0}, nil
 }
 
-func (s *MemStorage) Write(ctx *kvrpcpb.Context, batch []Modify) error {
+// Write ...
+func (s *MemStorage) Write(_ *kvrpcpb.Context, batch []Modify) error {
 	for _, m := range batch {
 		switch data := m.Data.(type) {
 		case Put:
@@ -67,6 +70,7 @@ func (s *MemStorage) Write(ctx *kvrpcpb.Context, batch []Modify) error {
 	return nil
 }
 
+// Get ...
 func (s *MemStorage) Get(cf string, key []byte) []byte {
 	item := memItem{key: key}
 	var result llrb.Item
@@ -86,6 +90,7 @@ func (s *MemStorage) Get(cf string, key []byte) []byte {
 	return result.(memItem).value
 }
 
+// Set ...
 func (s *MemStorage) Set(cf string, key []byte, value []byte) {
 	item := memItem{key, value, true}
 	switch cf {
@@ -98,6 +103,7 @@ func (s *MemStorage) Set(cf string, key []byte, value []byte) {
 	}
 }
 
+// HasChanged ...
 func (s *MemStorage) HasChanged(cf string, key []byte) bool {
 	item := memItem{key: key}
 	var result llrb.Item
@@ -116,6 +122,7 @@ func (s *MemStorage) HasChanged(cf string, key []byte) bool {
 	return !result.(memItem).fresh
 }
 
+// Len ...
 func (s *MemStorage) Len(cf string) int {
 	switch cf {
 	case engine_util.CfDefault:
@@ -177,8 +184,8 @@ func (mr *memReader) IterCF(cf string) engine_util.DBIterator {
 	return &memIter{data, min.(memItem), mr}
 }
 
-func (r *memReader) Close() {
-	if r.iterCount > 0 {
+func (mr *memReader) Close() {
+	if mr.iterCount > 0 {
 		panic("Unclosed iterator")
 	}
 }

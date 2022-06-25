@@ -1,6 +1,6 @@
 package storage
 
-// Modify is a single modification to TinyKV's underlying storage.
+// Modify is a single modification to the underlying storage of TinyKV.
 type Modify struct {
 	Data interface{}
 }
@@ -16,6 +16,7 @@ type Delete struct {
 	Cf  string
 }
 
+// Key gets the key of the modification.
 func (m *Modify) Key() []byte {
 	switch m.Data.(type) {
 	case Put:
@@ -26,14 +27,15 @@ func (m *Modify) Key() []byte {
 	return nil
 }
 
+// Value gets the value of the modification.
 func (m *Modify) Value() []byte {
 	if putData, ok := m.Data.(Put); ok {
 		return putData.Value
 	}
-
 	return nil
 }
 
+// Cf gets the column family of the modification.
 func (m *Modify) Cf() string {
 	switch m.Data.(type) {
 	case Put:

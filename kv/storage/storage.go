@@ -14,8 +14,9 @@ type Storage interface {
 	Reader(ctx *kvrpcpb.Context) (StorageReader, error)
 }
 
+// StorageReader reads from Storage.
 type StorageReader interface {
-	// When the key doesn't exist, return nil for the value
+	// GetCF gets the column family, and returns nil for the value when the key doesn't exist
 	GetCF(cf string, key []byte) ([]byte, error)
 	IterCF(cf string) engine_util.DBIterator
 	Close()
