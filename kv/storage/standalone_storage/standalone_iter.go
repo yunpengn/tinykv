@@ -10,19 +10,27 @@ type standAloneIter struct {
 	iter *badger.Iterator
 }
 
-func (s standAloneIter) Item() engine_util.DBItem {
-	return nil
+// Item ...
+func (s *standAloneIter) Item() engine_util.DBItem {
+	return &standAloneItem{}
 }
 
-func (s standAloneIter) Valid() bool {
-	return false
+// Valid ...
+func (s *standAloneIter) Valid() bool {
+	return s.iter.Valid()
 }
 
-func (s standAloneIter) Next() {
+// Next ...
+func (s *standAloneIter) Next() {
+	s.iter.Next()
 }
 
-func (s standAloneIter) Seek(_ []byte) {
+// Seek ...
+func (s *standAloneIter) Seek(key []byte) {
+	s.iter.Seek(key)
 }
 
-func (s standAloneIter) Close() {
+// Close ...
+func (s *standAloneIter) Close() {
+	s.iter.Close()
 }

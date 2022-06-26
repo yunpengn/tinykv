@@ -40,11 +40,12 @@ func NewStandAloneStorage(conf *config.Config) *StandAloneStorage {
 	return &StandAloneStorage{db: db}
 }
 
+// Start ...
 func (s *StandAloneStorage) Start() error {
-	// Your Code Here (1).
 	return nil
 }
 
+// Stop ...
 func (s *StandAloneStorage) Stop() error {
 	if err := s.db.Close(); err != nil {
 		log.Warnf("Unable to close the badger DB due to %s", err)
@@ -52,12 +53,14 @@ func (s *StandAloneStorage) Stop() error {
 	return nil
 }
 
+// Reader ...
 func (s *StandAloneStorage) Reader(_ *kvrpcpb.Context) (storage.StorageReader, error) {
 	return &standAloneReader{
 		txn: s.db.NewTransaction(false),
 	}, nil
 }
 
+// Write ...
 func (s *StandAloneStorage) Write(_ *kvrpcpb.Context, batch []storage.Modify) error {
 	return s.db.Update(func(txn *badger.Txn) error {
 		// Iterates over each operation.
