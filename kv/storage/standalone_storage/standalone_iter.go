@@ -12,7 +12,7 @@ type standAloneIter struct {
 
 // Item ...
 func (s *standAloneIter) Item() engine_util.DBItem {
-	return &standAloneItem{}
+	return &standAloneItem{item: s.iter.Item()}
 }
 
 // Valid ...

@@ -1,7 +1,12 @@
 package standalone_storage
 
+import (
+	"github.com/Connor1996/badger"
+)
+
 // standAloneItem is an item returned from standAloneIter.
 type standAloneItem struct {
+	item *badger.Item
 }
 
 // Key ...
