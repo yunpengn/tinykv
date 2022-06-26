@@ -58,6 +58,22 @@ func (s *StandAloneStorage) Reader(ctx *kvrpcpb.Context) (storage.StorageReader,
 }
 
 func (s *StandAloneStorage) Write(ctx *kvrpcpb.Context, batch []storage.Modify) error {
-	// Your Code Here (1).
-	return nil
+	return s.db.Update(func(txn *badger.Txn) error {
+		// Iterates over each operation.
+		for _, modify := range batch {
+			switch modify.Data.(type) {
+			case storage.Put:
+				if err := txn.Set(modify.Key(), modify.Value()); err != nil {
+					return err
+				}
+			case storage.Delete:
+				if err := txn.Delete(modify.Key()); err != nil {
+					return err
+				}
+			default:
+				log.Infof("Skip this modification since it is not supported %#v", modify.Data)
+			}
+		}
+		return nil
+	})
 }
