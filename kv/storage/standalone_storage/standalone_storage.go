@@ -52,12 +52,13 @@ func (s *StandAloneStorage) Stop() error {
 	return nil
 }
 
-func (s *StandAloneStorage) Reader(ctx *kvrpcpb.Context) (storage.StorageReader, error) {
-	// Your Code Here (1).
-	return nil, nil
+func (s *StandAloneStorage) Reader(_ *kvrpcpb.Context) (storage.StorageReader, error) {
+	return &standAloneReader{
+		txn: s.db.NewTransaction(false),
+	}, nil
 }
 
-func (s *StandAloneStorage) Write(ctx *kvrpcpb.Context, batch []storage.Modify) error {
+func (s *StandAloneStorage) Write(_ *kvrpcpb.Context, batch []storage.Modify) error {
 	return s.db.Update(func(txn *badger.Txn) error {
 		// Iterates over each operation.
 		for _, modify := range batch {
