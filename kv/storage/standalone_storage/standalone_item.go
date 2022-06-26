@@ -11,25 +11,25 @@ type standAloneItem struct {
 
 // Key ...
 func (s *standAloneItem) Key() []byte {
-	return nil
+	return s.item.Key()
 }
 
 // KeyCopy ...
 func (s *standAloneItem) KeyCopy(dst []byte) []byte {
-	return nil
+	return s.item.KeyCopy(dst)
 }
 
 // Value ...
 func (s *standAloneItem) Value() ([]byte, error) {
-	return nil, nil
+	return s.item.Value()
 }
 
 // ValueSize ...
 func (s *standAloneItem) ValueSize() int {
-	return 0
+	return s.item.ValueSize()
 }
 
 // ValueCopy ...
 func (s *standAloneItem) ValueCopy(dst []byte) ([]byte, error) {
-	return nil, nil
+	return s.item.ValueCopy(dst)
 }
