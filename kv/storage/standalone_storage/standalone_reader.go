@@ -24,7 +24,7 @@ func (s *standAloneReader) GetCF(_ string, key []byte) ([]byte, error) {
 
 // IterCF ...
 func (s *standAloneReader) IterCF(cf string) engine_util.DBIterator {
-	return &standAloneIter{}
+	return &standAloneIter{iter: s.txn.NewIterator(badger.DefaultIteratorOptions)}
 }
 
 // Close ...
