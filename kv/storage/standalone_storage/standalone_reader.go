@@ -11,8 +11,15 @@ type standAloneReader struct {
 }
 
 // GetCF ...
-func (s *standAloneReader) GetCF(cf string, key []byte) ([]byte, error) {
-	return nil, nil
+func (s *standAloneReader) GetCF(_ string, key []byte) ([]byte, error) {
+	// Gets the item.
+	item, err := s.txn.Get(key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Copies the value of the ite.
+	return item.ValueCopy(nil)
 }
 
 // IterCF ...
