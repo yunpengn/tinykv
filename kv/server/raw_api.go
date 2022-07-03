@@ -3,10 +3,9 @@ package server
 import (
 	"context"
 
-	"github.com/pingcap-incubator/tinykv/log"
-
 	"github.com/Connor1996/badger"
 	"github.com/pingcap-incubator/tinykv/kv/storage"
+	"github.com/pingcap-incubator/tinykv/log"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/kvrpcpb"
 )
 
