@@ -131,7 +131,7 @@ type DBItem interface {
 
 	// ValueSize returns the size of the value.
 	ValueSize() int
-	
+
 	// ValueCopy returns a copy of the value of the item from the value log, writing it to dst slice.
 	// If nil is passed, or capacity of dst isn't sufficient, a new slice would be allocated and returned.
 	ValueCopy(dst []byte) ([]byte, error)
