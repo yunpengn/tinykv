@@ -17,6 +17,9 @@ func (s *standAloneReader) GetCF(cf string, key []byte) ([]byte, error) {
 	// Gets the item.
 	item, err := s.txn.Get(keyWithCF)
 	if err != nil {
+		if err == badger.ErrKeyNotFound {
+			return nil, nil
+		}
 		return nil, err
 	}
 
