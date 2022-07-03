@@ -12,11 +12,13 @@ type standAloneReader struct {
 }
 
 // GetCF ...
-func (s *standAloneReader) GetCF(_ string, key []byte) ([]byte, error) {
+func (s *standAloneReader) GetCF(cf string, key []byte) ([]byte, error) {
+	keyWithCF := engine_util.KeyWithCF(cf, key)
+
 	// Gets the item.
-	item, err := s.txn.Get(key)
+	item, err := s.txn.Get(keyWithCF)
 	if err != nil {
-		log.Warnf("Unable to get the item for key %#v", key)
+		log.Warnf("Unable to get the item for key %#v", keyWithCF)
 		return nil, err
 	}
 

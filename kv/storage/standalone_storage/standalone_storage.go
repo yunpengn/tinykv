@@ -3,6 +3,8 @@ package standalone_storage
 import (
 	"os"
 
+	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
+
 	"github.com/Connor1996/badger"
 	"github.com/pingcap-incubator/tinykv/kv/config"
 	"github.com/pingcap-incubator/tinykv/kv/storage"
@@ -17,6 +19,7 @@ type StandAloneStorage struct {
 	db *badger.DB
 }
 
+// NewStandAloneStorage creates a new instance of standalone storage.
 func NewStandAloneStorage(conf *config.Config) *StandAloneStorage {
 	// Creates the directory if it does not exist yet.
 	if util.DirExists(conf.DBPath) {
@@ -49,15 +52,18 @@ func (s *StandAloneStorage) Start() error {
 func (s *StandAloneStorage) Stop() error {
 	if err := s.db.Close(); err != nil {
 		log.Warnf("Unable to close the badger DB due to %s", err)
+		return err
 	}
 	return nil
 }
 
 // Reader ...
 func (s *StandAloneStorage) Reader(_ *kvrpcpb.Context) (storage.StorageReader, error) {
-	return &standAloneReader{
-		txn: s.db.NewTransaction(false),
-	}, nil
+	// Creates a transaction for consistent snapshot.
+	txn := s.db.NewTransaction(false)
+
+	// Returns a new reader.
+	return &standAloneReader{txn: txn}, nil
 }
 
 // Write ...
@@ -65,13 +71,16 @@ func (s *StandAloneStorage) Write(_ *kvrpcpb.Context, batch []storage.Modify) er
 	return s.db.Update(func(txn *badger.Txn) error {
 		// Iterates over each operation.
 		for _, modify := range batch {
+			keyWithCF := engine_util.KeyWithCF(modify.Cf(), modify.Key())
+
+			// Performs the modification.
 			switch modify.Data.(type) {
 			case storage.Put:
-				if err := txn.Set(modify.Key(), modify.Value()); err != nil {
+				if err := txn.Set(keyWithCF, modify.Value()); err != nil {
 					return err
 				}
 			case storage.Delete:
-				if err := txn.Delete(modify.Key()); err != nil {
+				if err := txn.Delete(keyWithCF); err != nil {
 					return err
 				}
 			default:
