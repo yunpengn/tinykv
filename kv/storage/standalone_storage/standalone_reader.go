@@ -3,7 +3,6 @@ package standalone_storage
 import (
 	"github.com/Connor1996/badger"
 	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
-	"github.com/pingcap-incubator/tinykv/log"
 )
 
 // standAloneReader reads from StandAloneStorage.
@@ -18,7 +17,6 @@ func (s *standAloneReader) GetCF(cf string, key []byte) ([]byte, error) {
 	// Gets the item.
 	item, err := s.txn.Get(keyWithCF)
 	if err != nil {
-		log.Warnf("Unable to get the item for key %#v", keyWithCF)
 		return nil, err
 	}
 

@@ -3,6 +3,9 @@ package server
 import (
 	"context"
 
+	"github.com/pingcap-incubator/tinykv/log"
+
+	"github.com/Connor1996/badger"
 	"github.com/pingcap-incubator/tinykv/kv/storage"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/kvrpcpb"
 )
@@ -15,14 +18,17 @@ func (server *Server) RawGet(_ context.Context, req *kvrpcpb.RawGetRequest) (*kv
 	// Gets a reader.
 	reader, err := server.storage.Reader(req.GetContext())
 	if err != nil {
-		return nil, err
+		return &kvrpcpb.RawGetResponse{Error: err.Error()}, nil
 	}
 	defer reader.Close()
 
 	// Reads the key-value pair.
 	value, err := reader.GetCF(req.GetCf(), req.GetKey())
 	if err != nil {
-		return nil, err
+		return &kvrpcpb.RawGetResponse{
+			Error:    err.Error(),
+			NotFound: err == badger.ErrKeyNotFound,
+		}, nil
 	}
 	return &kvrpcpb.RawGetResponse{Value: value}, nil
 }
@@ -38,7 +44,7 @@ func (server *Server) RawPut(_ context.Context, req *kvrpcpb.RawPutRequest) (*kv
 
 	// Writes to the underlying storage.
 	if err := server.storage.Write(req.GetContext(), []storage.Modify{modify}); err != nil {
-		return nil, err
+		return &kvrpcpb.RawPutResponse{Error: err.Error()}, nil
 	}
 	return &kvrpcpb.RawPutResponse{}, nil
 }
@@ -53,7 +59,7 @@ func (server *Server) RawDelete(_ context.Context, req *kvrpcpb.RawDeleteRequest
 
 	// Writes to the underlying storage.
 	if err := server.storage.Write(req.GetContext(), []storage.Modify{modify}); err != nil {
-		return nil, err
+		return &kvrpcpb.RawDeleteResponse{Error: err.Error()}, nil
 	}
 	return &kvrpcpb.RawDeleteResponse{}, nil
 }
@@ -63,7 +69,7 @@ func (server *Server) RawScan(_ context.Context, req *kvrpcpb.RawScanRequest) (*
 	// Gets a reader.
 	reader, err := server.storage.Reader(req.GetContext())
 	if err != nil {
-		return nil, err
+		return &kvrpcpb.RawScanResponse{Error: err.Error()}, nil
 	}
 	defer reader.Close()
 
@@ -76,13 +82,13 @@ func (server *Server) RawScan(_ context.Context, req *kvrpcpb.RawScanRequest) (*
 	iter.Seek(req.GetStartKey())
 
 	// Performs a scan.
-	for i := uint32(0); i < req.GetLimit(); i++ {
+	for i := uint32(0); i < req.GetLimit() && iter.Valid(); i++ {
 		item := iter.Item()
 
 		// Reads the item.
 		value, itemErr := item.ValueCopy(nil)
 		if itemErr != nil {
-			return nil, itemErr
+			log.Warnf("Unable to copy value due to err=%s", itemErr)
 		}
 		result = append(result, &kvrpcpb.KvPair{Key: item.KeyCopy(nil), Value: value})
 
